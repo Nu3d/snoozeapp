@@ -2,6 +2,9 @@ package com.example.mobileexer;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,12 +12,15 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.ListView;
+import android.graphics.Bitmap;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 	private SeekBar rücken;
@@ -27,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	private Button sitzen;
 	private Button zerogravity;
 	private MediaPlayer mMediaPlayer;
+	private ImageView colorp;
+	private View preview;
 	/**
 	 * Handles audio focus when playing a sound file
 	 */
@@ -65,6 +73,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		colorp = findViewById(R.id.colorpicker);
+		preview = findViewById(R.id.test);
+
+		colorp.setDrawingCacheEnabled(true);
+		colorp.buildDrawingCache(true);
+
+		colorp.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent event ) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE){
+					Bitmap bitmap = colorp.getDrawingCache();
+
+					int pixel = bitmap.getPixel((int)event.getX(),(int)event.getY());
+
+					//R,G,B
+					int r = Color.red(pixel);
+					int g = Color.green(pixel);
+					int b = Color.blue(pixel);
+
+					//get Hex value
+					String hex = "#"+ Integer.toHexString(pixel);
+					//test color preview
+					preview.setBackgroundColor(Color.rgb(r,g,b));
+
+				}
+				return true;
+			}
+		});
 
 		meditationList = findViewById(R.id.meditation_list);
 		rücken = (SeekBar)findViewById(R.id.rücken_Seekbar);
